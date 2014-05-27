@@ -1396,13 +1396,15 @@ module ActiveRecord
       end 
 
       def columns_for_distinct(columns, orders) #:nodoc:
+
         # construct a valid columns name for DISTINCT clause, 
         # ie. one that includes the ORDER BY columns, using FIRST_VALUE such that 
         # the inclusion of these columns doesn't invalidate the DISTINCT
         #
         # It does not construct DISTINCT clause. Just return column names for distinct.
         order_columns = orders.reject(&:blank?).map{ |s|
-          s = s.to_sql unless s.is_a?(String)
+          s = s.to_sql.gsub(/\`/, '') unless s.is_a?(String)
+        #  raise s.inspect.to_s
           # remove any ASC/DESC modifiers
           s.gsub(/\s+(ASC|DESC)\s*?/i, '')
           }.reject(&:blank?).map.with_index { |column,i|
